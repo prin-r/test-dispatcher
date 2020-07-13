@@ -1,13 +1,19 @@
 import { CombinedFetcher, CCXTFetcher, CryptoCompareFetcher, FetcherInterface } from '@open-web3/fetcher';
 import config from './config';
+import BandPriceFetcher from './BandPriceFetcher';
 
-const CURRENCIES: { [key: string]: string[] } = {
-  BTC: ['XBTC', 'RENBTC']
+const CURRENCIES: { [key: string]: string } = {
+  BTC: 'XBTC',
+  ETH: 'ETH'
 };
 
 const createFetcher = (exchange: string): FetcherInterface => {
   if (exchange === 'CryptoCompare') {
     return new CryptoCompareFetcher('CCCAGG', config.cryptoCompareApiKey);
+  }
+
+  if (exchange === 'BandProtocol') {
+    return new BandPriceFetcher(config.bandMnemonic);
   }
 
   if (exchange.startsWith('CCXT')) {
