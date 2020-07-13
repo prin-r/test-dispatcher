@@ -33,6 +33,8 @@ const config = () => {
     });
 
   const config = {
+    bandMnemonic: process.env.BAND_MNEMONIC as string,
+    bandUrl: process.env.BAND_URL as string,
     wsUrl: process.env.WS_URL as string,
     seed: process.env.SEED as string,
     alphaVantageApiKey: process.env.ALPHA_VANTAGE_API_KEY as string,
