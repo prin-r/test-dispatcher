@@ -13,7 +13,7 @@ const createFetcher = (exchange: string): FetcherInterface => {
   }
 
   if (exchange === 'BandProtocol') {
-    return new BandPriceFetcher(config.bandMnemonic, config.bandUrl);
+    return new BandPriceFetcher(config.bandMnemonic);
   }
 
   if (exchange.startsWith('CCXT')) {

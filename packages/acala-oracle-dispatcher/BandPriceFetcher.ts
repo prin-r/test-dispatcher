@@ -1,17 +1,18 @@
 import { FetcherInterface } from '@open-web3/fetcher';
 const BandChain = require('@bandprotocol/bandchain.js');
 
-// tx parameters
-const gasAmount = 100;
-const gasLimit = 1000000;
-
-// requst parameters
+const endpoint = 'http://guanyu-devnet.bandchain.org/rest';
 const oracleScriptID = 1;
 const minCount = 4;
 const askCount = 4;
+const gasAmount = 100;
+const gasLimit = 1000000;
+
 const multiplier: 1_000_000 = 1_000_000;
 
-const fetch = async (pair: string, mnemonic: string, bandchain: any) => {
+const bandchain = new BandChain(endpoint);
+
+const fetch = async (pair: string, mnemonic: string) => {
   try {
     const oracleScript = await bandchain.getOracleScript(oracleScriptID);
     const requestID = await bandchain.submitRequestTx(
@@ -34,13 +35,11 @@ const fetch = async (pair: string, mnemonic: string, bandchain: any) => {
 
 export default class BandPriceFetcher implements FetcherInterface {
   private bandMnemonic = '';
-  private bandchain = null;
-  constructor(bandMnemonic: string, bandUrl: string) {
+  constructor(bandMnemonic: string) {
     this.bandMnemonic = bandMnemonic;
-    this.bandchain = new BandChain(bandUrl);
   }
 
   getPrice(pair: string): Promise<string> {
-    return fetch(pair, this.bandMnemonic, this.bandchain);
+    return fetch(pair, this.bandMnemonic);
   }
 }
