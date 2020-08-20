@@ -47,7 +47,11 @@ export default class PriceFetcher {
       this.symbols.map((symbol) =>
         this.fetchers[symbol].getPrice(symbol).then((price) => {
           const [base] = symbol.split('/');
-          return (CURRENCIES[base] || [base]).map((currency) => ({ currency, price }));
+          return [
+            { currency: 'ACA', price: '300' },
+            { currency: 'BTC', price: '500' }
+          ];
+          // return (CURRENCIES[base] || [base]).map((currency) => ({ currency, price }));
         })
       )
     );
