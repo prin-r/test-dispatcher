@@ -2,30 +2,31 @@ import { FetcherInterface } from '@open-web3/fetcher';
 const BandChain = require('@bandprotocol/bandchain.js');
 
 const endpoint = 'http://guanyu-devnet.bandchain.org/rest';
-const oracleScriptID = 1;
-const minCount = 4;
+const oracleScriptID = 13;
+const minCount = 3;
 const askCount = 4;
 const gasAmount = 100;
 const gasLimit = 1000000;
 
 const multiplier: 1_000_000 = 1_000_000;
 
-const bandchain = new BandChain(endpoint);
-
 const fetch = async (pair: string, mnemonic: string) => {
   try {
+    const bandchain = new BandChain(endpoint);
     const oracleScript = await bandchain.getOracleScript(oracleScriptID);
+    const [base_symbol, quote_symbol] = pair.split('/');
     const requestID = await bandchain.submitRequestTx(
       oracleScript,
-      { symbol: pair.split('/')[0], multiplier },
+      { base_symbol, quote_symbol, aggregation_method: 'median', multiplier },
       { minCount, askCount },
       mnemonic,
-      gasAmount,
-      gasLimit
+      'from_acala'
     );
+
     const {
       ResponsePacketData: { result }
     } = await bandchain.getRequestResult(requestID);
+
     return (Buffer.from(result, 'base64').reduce((a, e) => a * 256 + e, 0) / multiplier).toString();
   } catch (e) {
     console.log(e);

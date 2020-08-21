@@ -2,9 +2,9 @@ import { CombinedFetcher, CCXTFetcher, CryptoCompareFetcher, FetcherInterface } 
 import config from './config';
 import BandPriceFetcher from './BandPriceFetcher';
 
-const CURRENCIES: { [key: string]: string } = {
-  BTC: 'XBTC',
-  ETH: 'ETH'
+const CURRENCIES: { [key: string]: string[] } = {
+  BTC: ['XBTC', 'RENBTC'],
+  DOT: ['DOT']
 };
 
 const createFetcher = (exchange: string): FetcherInterface => {
@@ -43,18 +43,12 @@ export default class PriceFetcher {
   }
 
   async fetchPrices(): Promise<{ currency: any; price: string }[]> {
-    const res = await Promise.all(
-      this.symbols.map((symbol) =>
-        this.fetchers[symbol].getPrice(symbol).then((price) => {
-          const [base] = symbol.split('/');
-          return [
-            { currency: 'ACA', price: '300' },
-            { currency: 'BTC', price: '500' }
-          ];
-          // return (CURRENCIES[base] || [base]).map((currency) => ({ currency, price }));
-        })
-      )
-    );
+    const res = [];
+    for (let symbol of this.symbols) {
+      const price = await this.fetchers[symbol].getPrice(symbol);
+      const [base] = symbol.split('/');
+      res.push((CURRENCIES[base] || [base]).map((currency) => ({ currency, price })));
+    }
     return res.reduce((acc, val) => acc.concat(val), []);
   }
 }
