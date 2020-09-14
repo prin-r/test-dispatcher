@@ -79,7 +79,7 @@ const run = async (overrideConfig: Partial<ReturnType<typeof readEnvConfig>> = {
   heartbeats.addHeartbeat('feedData', feedDataHeartbeat);
 
   const feedData = async (data: Array<{ currency: string; price: string }>) => {
-    const members = await api.api.query.oracle.members();
+    const members = await api.api.query.bandOracle.members();
     const index = (members as any).findIndex((x: any) => x.eq(oracleAccount.address));
     if (index === -1) {
       logger.info('Not valid oracle operator', {
@@ -89,7 +89,7 @@ const run = async (overrideConfig: Partial<ReturnType<typeof readEnvConfig>> = {
     }
     const values = data.map(({ currency, price }) => [currency, toBaseUnit(price).toFixed()]);
     const block = (await api.api.rpc.chain.getHeader()).number.toNumber();
-    const nonce = await api.api.query.oracle.nonces(oracleAccount.address);
+    const nonce = await api.api.query.bandOracle.nonces(oracleAccount.address);
     const payload = api.api.registry.createType('(u32, BlockNumber, Vec<(CurrencyId, Price)>)' as any, [
       nonce,
       block,
@@ -104,7 +104,7 @@ const run = async (overrideConfig: Partial<ReturnType<typeof readEnvConfig>> = {
       payload: payload.toHex(),
       sig: u8aToHex(sig)
     });
-    const tx = api.api.tx.oracle.feedValues(values as any, index, block, sig);
+    const tx = api.api.tx.bandOracle.feedValues(values as any, index, block, sig);
 
     await tx.send();
 
