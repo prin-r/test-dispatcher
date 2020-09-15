@@ -25,30 +25,22 @@ const createFetcher = (exchange: string): FetcherInterface => {
 };
 
 export default class PriceFetcher {
-  private readonly fetchers: { [key: string]: FetcherInterface };
+  private readonly fetcher: FetcherInterface;
   private readonly symbols: string[];
 
   constructor() {
     this.symbols = config.symbols;
-
-    this.fetchers = this.symbols
-      .map((symbol) => {
-        const fetchers = config.exchanges[symbol].map((exchange) => createFetcher(exchange));
-        return { [symbol]: new CombinedFetcher(fetchers, 1) };
-      })
-      .reduce((acc, x) => {
-        const key = Object.keys(x)[0];
-        return { ...acc, [key]: x[key] };
-      });
+    this.fetcher = new BandPriceFetcher(config.bandMnemonic);
   }
 
   async fetchPrices(): Promise<{ currency: any; price: string }[]> {
-    const res = [];
-    for (let symbol of this.symbols) {
-      const price = await this.fetchers[symbol].getPrice(symbol);
-      const [base] = symbol.split('/');
-      res.push((CURRENCIES[base] || [base]).map((currency) => ({ currency, price })));
-    }
-    return res.reduce((acc, val) => acc.concat(val), []);
+    const prices = await this.fetcher.getPrice(JSON.stringify(this.symbols));
+    return JSON.parse(prices).map(({ currency, price }: { currency: any; price: string }) => {
+      let [base, _] = currency.split('/');
+      if (base === 'BTC') {
+        base = 'XBTC';
+      }
+      return { currency: base, price };
+    });
   }
 }
