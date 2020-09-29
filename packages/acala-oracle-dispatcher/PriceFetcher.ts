@@ -14,6 +14,9 @@ export default class PriceFetcher {
 
   async fetchPrices(): Promise<{ currency: any; price: string }[]> {
     const prices = await this.fetcher.getPrice(JSON.stringify(this.symbols));
+    if (prices === '') {
+      return [];
+    }
     return JSON.parse(prices).map(({ currency, price }: { currency: any; price: string }) => {
       let [base, _] = currency.split('/');
       if (base === 'BTC') {
