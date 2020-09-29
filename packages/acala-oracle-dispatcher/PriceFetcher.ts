@@ -19,9 +19,6 @@ export default class PriceFetcher {
     }
     return JSON.parse(prices).map(({ currency, price }: { currency: any; price: string }) => {
       let [base, _] = currency.split('/');
-      if (base === 'BTC') {
-        base = 'XBTC';
-      }
       return { currency: base, price };
     });
   }
